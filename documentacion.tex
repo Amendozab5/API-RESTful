@@ -1,0 +1,533 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{mdframed}
+\usepackage{tcolorbox}
+\usepackage{parskip}
+
+% ── Colores elegantes para el formateador de código ──
+\definecolor{codegreen}{rgb}{0,0.5,0}
+\definecolor{codegray}{rgb}{0.4,0.4,0.4}
+\definecolor{codepurple}{rgb}{0.5,0,0.7}
+\definecolor{codeblue}{rgb}{0.1,0.2,0.8}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
+\definecolor{uteqgreen}{rgb}{0.05,0.4,0.1}
+\definecolor{uteqorange}{rgb}{0.96,0.49,0.0}
+
+% ── Definición del lenguaje Kotlin para Listings ──
+\lstdefinelanguage{Kotlin}{
+  keywords={package, import, data, class, object, val, var, fun, override,
+            private, lateinit, lazy, get, set, return, if, else, try, catch,
+            throw, when, withContext, launch, suspend, is, as, null, for,
+            in, until, true, false, this},
+  keywordstyle=\color{codeblue}\bfseries,
+  ndkeywords={@Serializable, @SerializedName, @Override},
+  ndkeywordstyle=\color{codepurple}\bfseries,
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{codegreen}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]",
+  morestring=[b]'
+}
+
+% ── Definición del lenguaje XML ──
+\lstdefinelanguage{XML}{
+  keywords={xmlns,android,app,tools},
+  keywordstyle=\color{codeblue}\bfseries,
+  morestring=[b]",
+  stringstyle=\color{red}\ttfamily,
+  comment=[s]{<!--}{-->},
+  commentstyle=\color{codegreen}\ttfamily,
+  moredelim=[s][\color{codepurple}\bfseries]{<}{\ },
+  moredelim=[s][\color{codepurple}\bfseries]{</}{>},
+  morecomment=[s]{<?}{?>},
+}
+
+% ── Configuración general de Listings ──
+\lstset{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=6pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    frame=single,
+    rulecolor=\color{black!15}
+}
+
+% ── Encabezado y pie de página ──
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{uteqgreen}{\textbf{API RESTful en Android con Volley}}}
+\fancyhead[R]{\small\textcolor{codegray}{Aplicaciones Móviles -- UTEQ}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.2pt}
+
+% ── Formato de secciones ──
+\titleformat{\section}{\large\bfseries\color{uteqgreen}}{}{0em}{\thesection.\quad}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{uteqgreen!80!black}}{}{0em}{\thesubsection.\quad}
+
+\begin{document}
+
+% ══════════════════════════════════════════════
+%  CARÁTULA
+% ══════════════════════════════════════════════
+\begin{titlepage}
+\centering
+\includegraphics[width=3cm]{FCClogo.jpg}\\[0.3cm]
+{\large \textbf{UNIVERSIDAD TÉCNICA ESTATAL DE QUEVEDO}}\\[0.1cm]
+{\small Facultad de Ciencias de la Computación y Diseño Digital}\\[0.7cm]
+{\large \textbf{Ingeniería en Software}}\\[0.2cm]
+{\large \textbf{Asignatura:} Aplicaciones Móviles}\\[1cm]
+\rule{\textwidth}{0.5pt}\\[0.9cm]
+{\LARGE \textbf{Aplicación nativa Android}}\\[0.3cm]
+{\LARGE \textbf{con información de una API RESTful}}\\[0.5cm]
+{\LARGE \textbf{en formato JSON}}\\[0.5cm]
+\rule{\textwidth}{0.5pt}\\[1.2cm]
+{\large \textbf{Estudiante:}}\\[0.6cm]
+{\normalsize MENDOZA BERMELLO ANGELLO AGUSTIN\\[1cm]}
+{\large \textbf{Docente:} Ing. ZAMBRANO VEGA CRISTIAN GABRIEL}\\[0.3cm]
+{\large \textbf{Carrera:} Ingeniería en Software}\\[1.5cm]
+{\large \textbf{Link del Repositorio:}}\\[0.3cm]
+{\large \href{https://github.com/Amendozab5/API-RESTful}{https://github.com/Amendozab5/API-RESTful}}\\[0.6cm]
+{\large Año Lectivo 2026}
+\end{titlepage}
+
+% ══════════════════════════════════════════════
+%  TABLA DE CONTENIDOS
+% ══════════════════════════════════════════════
+\tableofcontents
+\newpage
+
+% ══════════════════════════════════════════════
+%  1. INTRODUCCIÓN
+% ══════════════════════════════════════════════
+\section{Introducción}
+
+En el desarrollo de aplicaciones móviles modernas, el consumo de servicios externos mediante APIs RESTful es una práctica fundamental. Este informe documenta la implementación de una aplicación nativa Android desarrollada en \textbf{Kotlin}, cuyo objetivo es consultar y mostrar la información de los alumnos del curso desde una base de datos alojada en \textbf{Supabase}, utilizando su API REST en formato \textbf{JSON}.
+
+La aplicación emplea la librería \textbf{Volley} para gestionar las peticiones HTTP, analiza el arreglo JSON recibido con las clases nativas de Android (\texttt{JSONArray} y \texttt{JSONObject}), y presenta la información formateada en un \texttt{TextView} con desplazamiento. La interfaz incorpora el logotipo oficial de la \textbf{UTEQ} y sigue los lineamientos de diseño institucional.
+
+% ══════════════════════════════════════════════
+%  2. OBJETIVOS
+% ══════════════════════════════════════════════
+\section{Objetivos}
+
+\subsection{Objetivo General}
+Desarrollar una aplicación nativa Android que consuma una API RESTful en formato JSON desde Supabase y muestre la lista de alumnos del curso en pantalla.
+
+\subsection{Objetivos Específicos}
+\begin{itemize}[leftmargin=1.5cm]
+    \item Crear y estructurar la tabla \texttt{alumnos} en Supabase con los datos del curso.
+    \item Implementar la petición HTTP GET con cabeceras de autenticación usando Volley.
+    \item Parsear el arreglo JSON recibido y extraer los campos requeridos.
+    \item Mostrar la lista de alumnos formateada en un \texttt{TextView} con scroll.
+    \item Gestionar correctamente los permisos de Internet en el manifiesto de Android.
+\end{itemize}
+
+% ══════════════════════════════════════════════
+%  3. MARCO TEÓRICO
+% ══════════════════════════════════════════════
+\section{Marco Teórico}
+
+\subsection{API RESTful}
+Una \textbf{API RESTful} (Representational State Transfer) es una interfaz de programación de aplicaciones que sigue los principios arquitectónicos REST. Permite la comunicación entre cliente y servidor mediante el protocolo HTTP utilizando métodos estándar como \texttt{GET}, \texttt{POST}, \texttt{PUT} y \texttt{DELETE}. Los datos se intercambian en formato \textbf{JSON} (JavaScript Object Notation), que es liviano y fácil de parsear.
+
+\subsection{Supabase}
+\textbf{Supabase} es una plataforma de backend como servicio (BaaS) de código abierto que proporciona una base de datos \textbf{PostgreSQL} con una API REST autogenerada. Cada tabla creada en Supabase es accesible mediante peticiones HTTP estándar. La autenticación se realiza enviando la clave pública \texttt{anon key} en las cabeceras de la petición.
+
+La URL base de la API REST de Supabase tiene la siguiente estructura:
+\begin{center}
+\texttt{https://\textless project-id\textgreater.supabase.co/rest/v1/\textless tabla\textgreater}
+\end{center}
+
+\subsection{Volley}
+\textbf{Volley} es una librería HTTP para Android desarrollada por Google que simplifica el proceso de hacer peticiones de red. Sus principales características son:
+\begin{itemize}[leftmargin=1.5cm]
+    \item Gestión automática de la cola de peticiones (\texttt{RequestQueue}).
+    \item Soporte nativo para respuestas JSON (\texttt{JsonArrayRequest}, \texttt{JsonObjectRequest}).
+    \item Manejo de errores de red integrado.
+    \item Caché automático de respuestas.
+\end{itemize}
+
+\subsection{JSON (JavaScript Object Notation)}
+JSON es un formato ligero de intercambio de datos. Una respuesta típica de la API de Supabase es un arreglo de objetos JSON, donde cada objeto representa un registro de la tabla. Ejemplo:
+
+\begin{lstlisting}[language={},caption={Ejemplo de respuesta JSON de Supabase}]
+[
+  {
+    "id": 1,
+    "cedula": "1250143656",
+    "apellidos_nombres": "BENITES PEREZ DARIEM ALBERTO",
+    "correo_institucional": "dbenitesp@uteq.edu.ec",
+    "paralelo": "A",
+    "periodo": "2026-2027"
+  },
+  {
+    "id": 2,
+    "cedula": "1250208392",
+    "apellidos_nombres": "BUENO TROYA ERWIN DANIEL",
+    "correo_institucional": "ebuenot@uteq.edu.ec",
+    "paralelo": "A",
+    "periodo": "2026-2027"
+  }
+]
+\end{lstlisting}
+
+% ══════════════════════════════════════════════
+%  4. DESARROLLO
+% ══════════════════════════════════════════════
+\section{Desarrollo}
+
+\subsection{Configuración de la Base de Datos en Supabase}
+
+Se creó un proyecto en Supabase y se configuró la tabla \texttt{alumnos} con la siguiente estructura:
+
+\begin{table}[H]
+\centering
+\caption{Estructura de la tabla \texttt{alumnos} en Supabase}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Columna} & \textbf{Tipo} & \textbf{Descripción} \\
+\midrule
+\texttt{id}                   & INT8    & Clave primaria autoincremental \\
+\texttt{cedula}               & VARCHAR & Número de cédula del alumno \\
+\texttt{apellidos\_nombres}   & VARCHAR & Apellidos y nombres completos \\
+\texttt{correo\_institucional}& VARCHAR & Correo \texttt{@uteq.edu.ec} \\
+\texttt{correo\_microsoft}    & VARCHAR & Correo \texttt{@msuteq.edu.ec} \\
+\texttt{paralelo}             & VARCHAR & Paralelo del curso (\texttt{A}) \\
+\texttt{periodo}              & VARCHAR & Periodo lectivo (\texttt{2026-2027}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Las columnas \texttt{paralelo} y \texttt{periodo} se agregaron y poblaron mediante el siguiente script SQL ejecutado en el \textbf{SQL Editor} de Supabase:
+
+\begin{lstlisting}[language=SQL, caption={Script SQL para agregar columnas y poblar datos}]
+-- Agregar columnas paralelo y periodo
+ALTER TABLE alumnos
+ADD COLUMN paralelo VARCHAR(50),
+ADD COLUMN periodo  VARCHAR(50);
+
+-- Poblar con los valores del curso
+UPDATE alumnos
+SET paralelo = 'A',
+    periodo  = '2026-2027';
+\end{lstlisting}
+
+Para permitir la lectura pública de los datos (sin autenticación de usuario), se deshabilitó el \textbf{Row Level Security (RLS)} de la tabla desde el panel de Supabase en \textit{Table Editor $\rightarrow$ Edit table $\rightarrow$ Disable RLS}.
+
+\subsection{Configuración del Proyecto Android}
+
+\subsubsection{Dependencias -- \texttt{libs.versions.toml}}
+
+Se agregó la dependencia de Volley al catálogo de versiones de Gradle:
+
+\begin{lstlisting}[language={}, caption={gradle/libs.versions.toml}]
+[versions]
+volley = "1.2.1"
+# ... otras versiones
+
+[libraries]
+volley = { group = "com.android.volley",
+           name  = "volley",
+           version.ref = "volley" }
+\end{lstlisting}
+
+\subsubsection{Módulo de la aplicación -- \texttt{build.gradle.kts}}
+
+Se actualizó el \texttt{compileSdk} a 37 (requerido por \texttt{androidx.core}) y se declaró la dependencia de Volley:
+
+\begin{lstlisting}[language={}, caption={app/build.gradle.kts (fragmento)}]
+android {
+    compileSdk = 37
+    defaultConfig {
+        minSdk    = 34
+        targetSdk = 36
+    }
+}
+
+dependencies {
+    implementation(libs.volley)
+    // ... otras dependencias
+}
+\end{lstlisting}
+
+\subsubsection{Permisos -- \texttt{AndroidManifest.xml}}
+
+Se declaró el permiso de Internet, indispensable para realizar peticiones HTTP:
+
+\begin{lstlisting}[language=XML, caption={AndroidManifest.xml -- permiso de Internet}]
+<manifest xmlns:android=
+    "http://schemas.android.com/apk/res/android">
+
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+
+    <application ... >
+        ...
+    </application>
+</manifest>
+\end{lstlisting}
+
+\subsection{Archivo de Configuración -- \texttt{SupabaseConfig.kt}}
+
+Se creó un objeto Kotlin centralizado para almacenar las constantes de conexión a Supabase. La \texttt{ANON\_KEY} no se sube al repositorio para proteger las credenciales:
+
+\begin{lstlisting}[language=Kotlin, caption={SupabaseConfig.kt}]
+package com.example.consumoapirest
+
+object SupabaseConfig {
+    // URL del proyecto (Settings -> API -> Project URL)
+    const val URL = "https://zzrekjzyywxpxvzfqnww.supabase.co"
+    // Reemplazar con la Anon Key real (no subir a Git)
+    const val ANON_KEY = "YOUR_SUPABASE_ANON_KEY"
+    const val TABLE_NAME = "alumnos"
+}
+\end{lstlisting}
+
+\subsection{Diseño de la Interfaz -- \texttt{activity\_main.xml}}
+
+El layout principal está compuesto por un \texttt{ConstraintLayout} que organiza los siguientes elementos de forma vertical:
+
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{ImageView}: Logotipo oficial de la UTEQ centrado en la cabecera.
+    \item \textbf{TextView} (título): "Lista de Alumnos" en negrita, color verde institucional (\texttt{\#1B5E20}).
+    \item \textbf{View} (divisor): Línea decorativa de 3dp en naranja (\texttt{\#F57C00}).
+    \item \textbf{ScrollView}: Contenedor desplazable que envuelve el \texttt{TextView} de la lista.
+    \item \textbf{TextView} (\texttt{txtAlumnosList}): Donde se muestra la lista de alumnos en formato HTML.
+\end{itemize}
+
+\begin{lstlisting}[language=XML, caption={activity\_main.xml (estructura principal)}]
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/main"
+    android:background="#FAFAFA" ... >
+
+    <!-- Logo UTEQ -->
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:src="@drawable/uteq_logo"
+        android:layout_height="100dp" ... />
+
+    <!-- Titulo -->
+    <TextView
+        android:id="@+id/txtTitle"
+        android:text="Lista de Alumnos"
+        android:textColor="#1B5E20"
+        android:textSize="24sp"
+        android:textStyle="bold" ... />
+
+    <!-- Divisor decorativo -->
+    <View
+        android:background="#F57C00"
+        android:layout_height="3dp" ... />
+
+    <!-- Lista con scroll -->
+    <ScrollView ... >
+        <LinearLayout ... >
+            <TextView
+                android:id="@+id/txtAlumnosList"
+                android:textSize="16sp"
+                android:lineSpacingExtra="8dp" ... />
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+\end{lstlisting}
+
+\subsection{Lógica Principal -- \texttt{MainActivity.kt}}
+
+La actividad principal implementa cuatro funciones clave:
+
+\subsubsection{\texttt{onCreate()}}
+Punto de entrada de la actividad. Verifica si las credenciales en \texttt{SupabaseConfig} son los marcadores de posición o las reales, y llama a la función correspondiente.
+
+\subsubsection{\texttt{fetchAlumnosFromSupabase()}}
+Realiza la petición HTTP GET a la API de Supabase usando Volley. Sobrescribe el método \texttt{getHeaders()} para incluir las cabeceras de autenticación requeridas.
+
+\begin{lstlisting}[language=Kotlin, caption={MainActivity.kt -- petición HTTP con Volley}]
+private fun fetchAlumnosFromSupabase() {
+    val url = "${SupabaseConfig.URL}/rest/v1/${SupabaseConfig.TABLE_NAME}"
+    val requestQueue = Volley.newRequestQueue(this)
+
+    val jsonArrayRequest = object : JsonArrayRequest(
+        Request.Method.GET, url, null,
+        Response.Listener { response ->
+            displayAlumnos(response)   // exito
+        },
+        Response.ErrorListener { error ->
+            // mostrar error descriptivo en pantalla
+            setFormattedText("<font color='#D32F2F'>
+                <b>Error:</b></font> ${error.message}")
+        }
+    ) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["apikey"]        = SupabaseConfig.ANON_KEY
+            headers["Authorization"] = "Bearer ${SupabaseConfig.ANON_KEY}"
+            return headers
+        }
+    }
+    requestQueue.add(jsonArrayRequest)
+}
+\end{lstlisting}
+
+\subsubsection{\texttt{displayAlumnos()}}
+Recorre el \texttt{JSONArray} recibido, extrae los campos de cada alumno y construye una cadena HTML formateada que se muestra en el \texttt{TextView}.
+
+\begin{lstlisting}[language=Kotlin, caption={MainActivity.kt -- parseo del JSONArray}]
+private fun displayAlumnos(jsonArray: JSONArray) {
+    val htmlBuilder = StringBuilder()
+
+    for (i in 0 until jsonArray.length()) {
+        val alumnoObj = jsonArray.getJSONObject(i)
+
+        val nombre  = getFieldAsString(alumnoObj,
+            listOf("apellidos_nombres", "nombre", "name"))
+        val paralelo = getFieldAsString(alumnoObj,
+            listOf("paralelo", "curso")) ?: "A"
+        val periodo  = getFieldAsString(alumnoObj,
+            listOf("periodo")) ?: "2026-2027"
+        val email   = getFieldAsString(alumnoObj,
+            listOf("correo_institucional", "email"))
+
+        val index = i + 1
+        htmlBuilder.append(
+            "<b>$index.- ${nombre?.uppercase()}</b><br>")
+        htmlBuilder.append("Paralelo: $paralelo<br>")
+        htmlBuilder.append("Periodo: $periodo<br>")
+        htmlBuilder.append("Email: $email<br><br>")
+    }
+    setFormattedText(htmlBuilder.toString())
+}
+\end{lstlisting}
+
+\subsubsection{\texttt{getFieldAsString()}}
+Función auxiliar que busca un campo en un \texttt{JSONObject} probando una lista de posibles nombres de clave. Esto permite soportar bases de datos con distintas convenciones de nomenclatura.
+
+\begin{lstlisting}[language=Kotlin, caption={MainActivity.kt -- búsqueda flexible de campos JSON}]
+private fun getFieldAsString(
+    jsonObj: JSONObject,
+    keys: List<String>
+): String? {
+    for (key in keys) {
+        if (jsonObj.has(key) && !jsonObj.isNull(key)) {
+            val value = jsonObj.optString(key)
+            if (value.isNotBlank() && value != "null")
+                return value
+        }
+    }
+    return null
+}
+\end{lstlisting}
+
+% ══════════════════════════════════════════════
+%  5. ESTRUCTURA DEL PROYECTO
+% ══════════════════════════════════════════════
+\section{Estructura del Proyecto}
+
+\begin{lstlisting}[language={}, caption={Árbol de archivos del proyecto Android}]
+ConsumoAPIRest/
+|- app/
+|   |- src/main/
+|   |   |- java/com/example/consumoapirest/
+|   |   |   |- MainActivity.kt       <- Logica + Volley + JSON
+|   |   |   +- SupabaseConfig.kt     <- Credenciales Supabase
+|   |   |- res/
+|   |   |   |- layout/
+|   |   |   |   +- activity_main.xml <- Diseno UI
+|   |   |   |- drawable/
+|   |   |   |   +- uteq_logo.png     <- Logo UTEQ
+|   |   |   +- values/
+|   |   |       |- strings.xml
+|   |   |       +- themes.xml
+|   |   +- AndroidManifest.xml       <- Permiso INTERNET
+|   +- build.gradle.kts              <- Dependencias (Volley)
++- gradle/
+    +- libs.versions.toml            <- Catalogo de versiones
+\end{lstlisting}
+
+% ══════════════════════════════════════════════
+%  6. RESULTADOS
+% ══════════════════════════════════════════════
+\section{Resultados}
+
+La aplicación se ejecutó correctamente en un emulador \textbf{Pixel 7 API 37.0} dentro de Android Studio. Al iniciarse, realiza automáticamente la petición GET a la API de Supabase y muestra la lista completa de los 19 alumnos del curso.
+
+Cada registro presenta el siguiente formato en pantalla:
+
+\begin{tcolorbox}[colback=backcolour, colframe=uteqorange, title=Salida en pantalla de la aplicación]
+\textbf{1.- BENITES PEREZ DARIEM ALBERTO}\\
+Paralelo: A\\
+Periodo: 2026-2027\\
+Email: dbenitesp@uteq.edu.ec\\[0.4em]
+\textbf{2.- BUENO TROYA ERWIN DANIEL}\\
+Paralelo: A\\
+Periodo: 2026-2027\\
+Email: ebuenot@uteq.edu.ec\\[0.4em]
+\textit{(...19 alumnos en total)}
+\end{tcolorbox}
+
+La interfaz muestra el logotipo de la UTEQ en la cabecera, el título ``Lista de Alumnos'' con los colores institucionales (verde y naranja), y la lista es desplazable para visualizar todos los registros.
+
+% ══════════════════════════════════════════════
+%  7. CONCLUSIONES
+% ══════════════════════════════════════════════
+\section{Conclusiones}
+
+\begin{enumerate}[leftmargin=1.5cm]
+    \item Se implementó exitosamente una aplicación nativa Android en Kotlin que consume la API RESTful de Supabase mediante peticiones HTTP GET con la librería Volley.
+    \item El uso de \textbf{Volley} simplificó considerablemente el manejo de peticiones de red al proporcionar una \texttt{RequestQueue} con soporte integrado para respuestas JSON, manejo de errores y gestión del ciclo de vida de las peticiones.
+    \item La separación de las credenciales en el archivo \texttt{SupabaseConfig.kt} y la exclusión de la \texttt{ANON\_KEY} del repositorio son buenas prácticas de seguridad fundamentales en el desarrollo de aplicaciones móviles.
+    \item El parseo manual del \texttt{JSONArray} con las clases nativas de Android (\texttt{JSONArray} / \texttt{JSONObject}) es eficiente para estructuras de datos simples y no requiere librerías de serialización adicionales.
+    \item Supabase demostró ser una plataforma ágil para el prototipado de backends, ya que genera automáticamente una API REST a partir de tablas PostgreSQL, reduciendo el tiempo de desarrollo del lado del servidor.
+\end{enumerate}
+
+% ══════════════════════════════════════════════
+%  8. CAPTURAS DE PANTALLA
+% ══════════════════════════════════════════════
+\section{Capturas de Pantalla}
+
+A continuación, se muestran las evidencias del correcto funcionamiento del proyecto, incluyendo el registro de datos en el servidor y la interfaz gráfica de la aplicación móvil.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{dbalumnos.png}
+    \caption{Captura de la tabla con los datos registrados en Supabase.}
+    \label{fig:dbalumnos}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{appapirestful.png}
+    \caption{Captura de la aplicación en funcionamiento.}
+    \label{fig:appapirestful}
+\end{figure}
+
+\end{document}
+
